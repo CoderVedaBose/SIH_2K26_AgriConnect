@@ -1,0 +1,98 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Fresh Tomatoes",
+      "category": "Vegetables",
+      "price": 42,
+      "unit": "kg",
+      "farmer": "Green Valley Farms",
+      "location": "Nadia, WB",
+      "rating": 4.8,
+      "badge": "High Demand"
+    },
+    {
+      "id": 2,
+      "name": "Organic Potatoes",
+      "category": "Vegetables",
+      "price": 32,
+      "unit": "kg",
+      "farmer": "Maa Kali FPO",
+      "location": "Hooghly, WB",
+      "rating": 4.7,
+      "badge": "Organic"
+    },
+    {
+      "id": 3,
+      "name": "Fresh Mangoes",
+      "category": "Fruits",
+      "price": 95,
+      "unit": "kg",
+      "farmer": "Mango Valley",
+      "location": "Malda, WB",
+      "rating": 4.9,
+      "badge": "Fresh Today"
+    },
+    {
+      "id": 4,
+      "name": "Basmati Rice",
+      "category": "Grains",
+      "price": 88,
+      "unit": "kg",
+      "farmer": "Bengal FPO",
+      "location": "Burdwan, WB",
+      "rating": 4.8,
+      "badge": "Best Seller"
+    },
+    {
+      "id": 5,
+      "name": "Red Onions",
+      "category": "Vegetables",
+      "price": 38,
+      "unit": "kg",
+      "farmer": "Krishi Shakti FPO",
+      "location": "Nadia, WB",
+      "rating": 4.6,
+      "badge": "High Demand"
+    },
+    {
+      "id": 6,
+      "name": "Fresh Milk",
+      "category": "Dairy",
+      "price": 58,
+      "unit": "litre",
+      "farmer": "Pure Dairy Farms",
+      "location": "Barasat, WB",
+      "rating": 4.9,
+      "badge": "Farm Fresh"
+    },
+    {
+      "id": 7,
+      "name": "Organic Wheat",
+      "category": "Organic",
+      "price": 65,
+      "unit": "kg",
+      "farmer": "Organic India FPO",
+      "location": "Birbhum, WB",
+      "rating": 4.8,
+      "badge": "Organic"
+    },
+    {
+      "id": 8,
+      "name": "Green Chillies",
+      "category": "Spices",
+      "price": 75,
+      "unit": "kg",
+      "farmer": "Fresh Harvest",
+      "location": "Howrah, WB",
+      "rating": 4.7,
+      "badge": "Fresh Today"
+    }
+  ],
+  "orders": [
+    
+  ],
+  "farmers": [
+
+  ]
+}

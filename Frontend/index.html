@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="AgriConnect - Direct farmer to customer marketplace"
+    >
+
+    <title>AgriConnect | Farm Fresh Marketplace</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap"
+        rel="stylesheet"
+    >
+</head>
+
+<body>
+
+<!-- =========================================================
+     LOADING SCREEN
+========================================================= -->
+
+<div id="loadingScreen" class="loading-screen">
+    <div class="loader-logo">🌱</div>
+    <h2>AgriConnect</h2>
+    <div class="loading-spinner"></div>
+    <p>Connecting to the farm...</p>
+</div>
+
+
+<!-- =========================================================
+     TOAST CONTAINER
+========================================================= -->
+
+<div id="toastContainer" class="toast-container"></div>
+
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+        <a href="#home" class="logo">
+            <span class="logo-icon">🌱</span>
+
+            <span>
+                <strong>Agri</strong>Connect
+            </span>
+        </a>
+
+
+        <nav id="mainNav" class="main-nav">
+
+            <a href="#home" class="nav-link active">
+                Home
+            </a>
+
+            <a href="#marketplace" class="nav-link">
+                Marketplace
+            </a>
+
+            <a href="#farmers" class="nav-link">
+                Farmers
+            </a>
+
+            <a href="#ai-tools" class="nav-link">
+                AI Tools
+            </a>
+
+            <a href="#orders" class="nav-link">
+                Orders
+            </a>
+
+        </nav>
+
+
+        <div class="nav-actions">
+
+            <button
+                id="themeBtn"
+                class="icon-btn"
+                title="Toggle theme"
+                aria-label="Toggle theme"
+            >
+                🌙
+            </button>
+
+
+            <button
+                id="cartBtn"
+                class="cart-btn"
+            >
+                🛒
+
+                <span>Cart</span>
+
+                <span
+                    id="cartCount"
+                    class="cart-count"
+                >
+                    0
+                </span>
+            </button>
+
+
+            <button
+                id="mobileMenuBtn"
+                class="mobile-menu-btn"
+                aria-label="Open menu"
+            >
+                ☰
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<main>
+
+<section id="home" class="hero">
+
+    <div class="hero-decoration hero-decoration-1">
+        🌿
+    </div>
+
+    <div class="hero-decoration hero-decoration-2">
+        🍅
+    </div>
+
+    <div class="hero-decoration hero-decoration-3">
+        🌾
+    </div>
+
+
+    <div class="container hero-grid">
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+                <span>●</span>
+                Fresh from local farms
+            </div>
+
+
+            <h1>
+                From
+                <span>Farm</span>
+                to Your
+                <span>Table.</span>
+            </h1>
+
+
+            <p class="hero-text">
+                Buy fresh produce directly from farmers.
+                Better prices for you, better earnings for them.
+                No unnecessary middlemen.
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a
+                    href="#marketplace"
+                    class="btn btn-primary btn-large"
+                >
+                    Explore Marketplace
+                    <span>→</span>
+                </a>
+
+
+                <button
+                    id="heroFarmerBtn"
+                    class="btn btn-outline btn-large"
+                >
+                    👨‍🌾 Join as Farmer
+                </button>
+
+            </div>
+
+
+            <div class="hero-stats">
+
+                <div class="hero-stat">
+                    <strong id="heroProductCount">0+</strong>
+                    <span>Fresh Products</span>
+                </div>
+
+                <div class="stat-divider"></div>
+
+                <div class="hero-stat">
+                    <strong>100%</strong>
+                    <span>Farmer Direct</span>
+                </div>
+
+                <div class="stat-divider"></div>
+
+                <div class="hero-stat">
+                    <strong>24/7</strong>
+                    <span>Marketplace</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="hero-circle"></div>
+
+            <div class="produce-card produce-card-1">
+                🍅
+                <span>Fresh</span>
+            </div>
+
+            <div class="produce-card produce-card-2">
+                🥭
+                <span>Organic</span>
+            </div>
+
+            <div class="produce-card produce-card-3">
+                🥬
+                <span>Local</span>
+            </div>
+
+
+            <div class="farm-illustration">
+
+                <div class="sun">☀️</div>
+
+                <div class="cloud cloud-1">
+                    ☁️
+                </div>
+
+                <div class="cloud cloud-2">
+                    ☁️
+                </div>
+
+                <div class="mountain mountain-back"></div>
+
+                <div class="mountain mountain-front"></div>
+
+                <div class="field field-1"></div>
+                <div class="field field-2"></div>
+                <div class="field field-3"></div>
+
+                <div class="farmer-character">
+                    👨‍🌾
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     MARKETPLACE
+========================================================= -->
+
+<section
+    id="marketplace"
+    class="section marketplace-section"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-label">
+                    FARM FRESH MARKET
+                </span>
+
+                <h2>
+                    Fresh produce,
+                    <span>fair prices.</span>
+                </h2>
+
+                <p>
+                    Shop directly from farmers across West Bengal.
+                </p>
+            </div>
+
+
+            <button
+                id="refreshProductsBtn"
+                class="btn btn-soft"
+            >
+                ↻ Refresh
+            </button>
+
+        </div>
+
+
+        <!-- SEARCH/FILTER BAR -->
+
+        <div class="market-toolbar">
+
+            <div class="search-box">
+
+                <span>🔎</span>
+
+                <input
+                    id="searchInput"
+                    type="search"
+                    placeholder="Search tomatoes, mangoes, rice..."
+                    autocomplete="off"
+                >
+
+                <button
+                    id="clearSearchBtn"
+                    class="clear-search"
+                    aria-label="Clear search"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="category-filter">
+
+                <button
+                    class="category-btn active"
+                    data-category="All"
+                >
+                    All
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Vegetables"
+                >
+                    🥬 Vegetables
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Fruits"
+                >
+                    🥭 Fruits
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Grains"
+                >
+                    🌾 Grains
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Dairy"
+                >
+                    🥛 Dairy
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Organic"
+                >
+                    🌱 Organic
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Spices"
+                >
+                    🌶️ Spices
+                </button>
+
+            </div>
+
+
+            <select
+                id="sortSelect"
+                class="sort-select"
+            >
+                <option value="default">
+                    Sort: Recommended
+                </option>
+
+                <option value="price-low">
+                    Price: Low to High
+                </option>
+
+                <option value="price-high">
+                    Price: High to Low
+                </option>
+
+                <option value="rating">
+                    Highest Rated
+                </option>
+
+                <option value="name">
+                    Name A-Z
+                </option>
+            </select>
+
+        </div>
+
+
+        <div
+            id="productsLoading"
+            class="products-loading"
+        >
+            <div class="loading-spinner dark"></div>
+            <p>Loading fresh products...</p>
+        </div>
+
+
+        <div
+            id="productsGrid"
+            class="products-grid"
+        ></div>
+
+
+        <div
+            id="emptyProducts"
+            class="empty-state hidden"
+        >
+            <div class="empty-icon">
+                🔍
+            </div>
+
+            <h3>No products found</h3>
+
+            <p>
+                Try another search or category.
+            </p>
+
+            <button
+                id="resetFiltersBtn"
+                class="btn btn-primary"
+            >
+                Reset Filters
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FARMER SECTION
+========================================================= -->
+
+<section
+    id="farmers"
+    class="section farmer-section"
+>
+
+    <div class="container farmer-grid">
+
+        <div class="farmer-content">
+
+            <span class="section-label">
+                FOR FARMERS
+            </span>
+
+            <h2>
+                Grow your business.
+                <span>Keep more.</span>
+            </h2>
+
+            <p>
+                Connect directly with customers and sell your
+                harvest without unnecessary middlemen.
+            </p>
+
+
+            <div class="farmer-benefits">
+
+                <div class="benefit">
+                    <div class="benefit-icon">💰</div>
+
+                    <div>
+                        <h4>Better Earnings</h4>
+                        <p>Keep more of your selling price.</p>
+                    </div>
+                </div>
+
+
+                <div class="benefit">
+                    <div class="benefit-icon">👥</div>
+
+                    <div>
+                        <h4>Direct Customers</h4>
+                        <p>Build relationships with buyers.</p>
+                    </div>
+                </div>
+
+
+                <div class="benefit">
+                    <div class="benefit-icon">🤖</div>
+
+                    <div>
+                        <h4>AI Insights</h4>
+                        <p>Use demand forecasts to plan harvests.</p>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <button
+                id="registerFarmerBtn"
+                class="btn btn-primary btn-large"
+            >
+                Register as Farmer →
+            </button>
+
+        </div>
+
+
+        <div class="farmer-card-wrapper">
+
+            <div class="farmer-main-card">
+
+                <div class="farmer-card-top">
+                    <span class="farmer-leaf">🌱</span>
+
+                    <span class="verified">
+                        ✓ Verified marketplace
+                    </span>
+                </div>
+
+
+                <div class="farmer-person">
+                    👨‍🌾
+                </div>
+
+
+                <h3>
+                    Sell directly.
+                </h3>
+
+                <p>
+                    Your farm. Your produce.
+                    Your customers.
+                </p>
+
+
+                <div class="mini-stats">
+
+                    <div>
+                        <strong>0%</strong>
+                        <span>Middleman</span>
+                    </div>
+
+                    <div>
+                        <strong>24/7</strong>
+                        <span>Visibility</span>
+                    </div>
+
+                    <div>
+                        <strong>AI</strong>
+                        <span>Insights</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     DASHBOARD
+========================================================= -->
+
+<section
+    id="dashboard"
+    class="section dashboard-section"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-label">
+                    MARKETPLACE OVERVIEW
+                </span>
+
+                <h2>
+                    AgriConnect
+                    <span>Dashboard</span>
+                </h2>
+            </div>
+
+            <button
+                id="refreshDashboardBtn"
+                class="btn btn-soft"
+            >
+                ↻ Refresh
+            </button>
+
+        </div>
+
+
+        <div class="dashboard-cards">
+
+            <div class="dashboard-card green-card">
+
+                <div class="dashboard-card-icon">
+                    🥬
+                </div>
+
+                <div>
+                    <span>Total Products</span>
+                    <strong id="dashboardProducts">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card orange-card">
+
+                <div class="dashboard-card-icon">
+                    📦
+                </div>
+
+                <div>
+                    <span>Total Orders</span>
+                    <strong id="dashboardOrders">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card purple-card">
+
+                <div class="dashboard-card-icon">
+                    👨‍🌾
+                </div>
+
+                <div>
+                    <span>Registered Farmers</span>
+                    <strong id="dashboardFarmers">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card blue-card">
+
+                <div class="dashboard-card-icon">
+                    💚
+                </div>
+
+                <div>
+                    <span>Marketplace Status</span>
+                    <strong>
+                        Online
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     AI TOOLS
+========================================================= -->
+
+<section
+    id="ai-tools"
+    class="section ai-section"
+>
+
+    <div class="container">
+
+        <div class="section-heading centered">
+
+            <span class="section-label">
+                SMART AGRICULTURE
+            </span>
+
+            <h2>
+                AI-powered
+                <span>farm tools.</span>
+            </h2>
+
+            <p>
+                Make smarter decisions with AgriConnect's
+                intelligent tools.
+            </p>
+
+        </div>
+
+
+        <div class="ai-grid">
+
+            <!-- FORECAST -->
+
+            <div class="ai-card forecast-card">
+
+                <div class="ai-card-header">
+
+                    <div class="ai-icon">
+                        🤖
+                    </div>
+
+                    <div>
+                        <span>AI DEMAND FORECAST</span>
+                        <h3>
+                            Know what to grow.
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <div class="forecast-controls">
+
+                    <div class="forecast-field">
+                        <label for="forecastRegion">Region</label>
+                        <select id="forecastRegion">
+                            <option value="">Loading regions...</option>
+                        </select>
+                    </div>
+
+                    <div class="forecast-field">
+                        <label for="forecastCrop">Crop</label>
+                        <select id="forecastCrop">
+                            <option value="">Loading crops...</option>
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="forecastResult"
+                    class="forecast-result"
+                >
+
+                    <div class="forecast-placeholder">
+                        <div>📈</div>
+
+                        <p>
+                            Select a region and crop, then generate
+                            the AI demand forecast.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="forecastBtn"
+                    class="btn btn-primary full-width"
+                >
+                    ✨ Generate Forecast
+                </button>
+
+            </div>
+
+
+            <!-- ROUTE -->
+
+            <div class="ai-card route-card">
+
+                <div class="ai-card-header">
+
+                    <div class="ai-icon route-icon">
+                        🚚
+                    </div>
+
+                    <div>
+                        <span>SMART DELIVERY</span>
+                        <h3>
+                            Optimize your route.
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <div class="route-form">
+
+                    <label>
+                        Starting Point
+                    </label>
+
+                    <input
+                        id="routeOrigin"
+                        type="text"
+                        placeholder="e.g. Nadia, WB"
+                    >
+
+
+                    <label>
+                        Destinations
+                    </label>
+
+                    <textarea
+                        id="routeDestinations"
+                        rows="3"
+                        placeholder="Enter destinations separated by commas&#10;e.g. Kolkata, Hooghly, Howrah"
+                    ></textarea>
+
+                </div>
+
+
+                <div
+                    id="routeResult"
+                    class="route-result hidden"
+                ></div>
+
+
+                <button
+                    id="optimizeRouteBtn"
+                    class="btn btn-primary full-width"
+                >
+                    🚀 Optimize Route
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ORDERS
+========================================================= -->
+
+<section
+    id="orders"
+    class="section orders-section"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-label">
+                    YOUR ACTIVITY
+                </span>
+
+                <h2>
+                    Recent
+                    <span>orders.</span>
+                </h2>
+
+                <p>
+                    Orders are loaded directly from the FastAPI backend.
+                </p>
+            </div>
+
+            <button
+                id="refreshOrdersBtn"
+                class="btn btn-soft"
+            >
+                ↻ Refresh Orders
+            </button>
+
+        </div>
+
+
+        <div
+            id="ordersList"
+            class="orders-list"
+        >
+
+            <div class="orders-placeholder">
+                <div>📦</div>
+                <h3>No orders loaded</h3>
+                <p>
+                    Place an order to see it here.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="footer">
+
+    <div class="container footer-grid">
+
+        <div class="footer-brand">
+
+            <a href="#home" class="logo footer-logo">
+                <span class="logo-icon">🌱</span>
+                <span>
+                    <strong>Agri</strong>Connect
+                </span>
+            </a>
+
+            <p>
+                Connecting farmers directly with
+                customers for a fairer food system.
+            </p>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>Marketplace</h4>
+
+            <a href="#marketplace">
+                Browse Products
+            </a>
+
+            <a href="#orders">
+                My Orders
+            </a>
+
+            <a href="#farmers">
+                Become a Farmer
+            </a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>Smart Tools</h4>
+
+            <a href="#ai-tools">
+                Demand Forecast
+            </a>
+
+            <a href="#ai-tools">
+                Route Optimizer
+            </a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>Backend</h4>
+
+            <span class="api-status">
+                <i id="apiStatusDot"></i>
+                <span id="apiStatusText">
+                    Checking API...
+                </span>
+            </span>
+
+            <a
+                href="http://127.0.0.1:8000/docs"
+                target="_blank"
+            >
+                API Documentation ↗
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        <div class="container">
+
+            <span>
+                © 2026 AgriConnect
+            </span>
+
+            <span>
+                Built with FastAPI + HTML + CSS + JavaScript
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+</main>
+
+
+<!-- =========================================================
+     CART DRAWER
+========================================================= -->
+
+<div
+    id="cartOverlay"
+    class="overlay"
+></div>
+
+
+<aside
+    id="cartDrawer"
+    class="cart-drawer"
+>
+
+    <div class="drawer-header">
+
+        <div>
+            <span class="section-label">
+                YOUR CART
+            </span>
+
+            <h2>
+                Shopping Cart
+            </h2>
+        </div>
+
+        <button
+            id="closeCartBtn"
+            class="close-btn"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div
+        id="cartItems"
+        class="cart-items"
+    ></div>
+
+
+    <div class="cart-footer">
+
+        <div class="cart-total-row">
+
+            <span>
+                Total
+            </span>
+
+            <strong id="cartTotal">
+                ₹0
+            </strong>
+
+        </div>
+
+
+        <button
+            id="checkoutBtn"
+            class="btn btn-primary full-width"
+        >
+            Proceed to Checkout →
+        </button>
+
+
+        <button
+            id="clearCartBtn"
+            class="btn btn-text full-width"
+        >
+            Clear Cart
+        </button>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================================================
+     CHECKOUT MODAL
+========================================================= -->
+
+<div
+    id="checkoutModal"
+    class="modal-container"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+                <span class="section-label">
+                    CHECKOUT
+                </span>
+
+                <h2>
+                    Complete your order
+                </h2>
+            </div>
+
+            <button
+                class="close-btn"
+                data-close-modal="checkoutModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="checkoutForm">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Full Name
+                    </label>
+
+                    <input
+                        id="customerName"
+                        name="customer_name"
+                        required
+                        type="text"
+                        placeholder="Your name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Phone Number
+                    </label>
+
+                    <input
+                        id="customerPhone"
+                        name="phone"
+                        required
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        pattern="[0-9]{10}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Delivery Address
+                </label>
+
+                <textarea
+                    id="customerAddress"
+                    name="address"
+                    required
+                    rows="3"
+                    placeholder="Complete delivery address"
+                ></textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Payment Method
+                </label>
+
+                <div class="payment-options">
+
+                    <label class="payment-option">
+
+                        <input
+                            type="radio"
+                            name="payment_method"
+                            value="Cash on Delivery"
+                            checked
+                        >
+
+                        <span>
+                            💵
+                            <strong>Cash on Delivery</strong>
+                        </span>
+
+                    </label>
+
+
+                    <label class="payment-option">
+
+                        <input
+                            type="radio"
+                            name="payment_method"
+                            value="UPI"
+                        >
+
+                        <span>
+                            📱
+                            <strong>UPI</strong>
+                        </span>
+
+                    </label>
+
+
+                    <label class="payment-option">
+
+                        <input
+                            type="radio"
+                            name="payment_method"
+                            value="Card"
+                        >
+
+                        <span>
+                            💳
+                            <strong>Card</strong>
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div class="checkout-summary">
+
+                <span>
+                    Order Total
+                </span>
+
+                <strong id="checkoutTotal">
+                    ₹0
+                </strong>
+
+            </div>
+
+
+            <button
+                id="placeOrderBtn"
+                type="submit"
+                class="btn btn-primary full-width btn-large"
+            >
+                Place Order
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FARMER REGISTRATION MODAL
+========================================================= -->
+
+<div
+    id="farmerModal"
+    class="modal-container"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+                <span class="section-label">
+                    FARMER REGISTRATION
+                </span>
+
+                <h2>
+                    Join AgriConnect
+                </h2>
+            </div>
+
+            <button
+                class="close-btn"
+                data-close-modal="farmerModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="farmerForm">
+
+            <div class="form-group">
+
+                <label>
+                    Farmer / Farm Name
+                </label>
+
+                <input
+                    id="farmerName"
+                    required
+                    type="text"
+                    placeholder="e.g. Green Valley Farms"
+                >
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Phone Number
+                    </label>
+
+                    <input
+                        id="farmerPhone"
+                        required
+                        type="tel"
+                        placeholder="10-digit number"
+                        pattern="[0-9]{10}"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Location
+                    </label>
+
+                    <input
+                        id="farmerLocation"
+                        required
+                        type="text"
+                        placeholder="e.g. Nadia, WB"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Main Produce
+                </label>
+
+                <input
+                    id="farmerProduce"
+                    required
+                    type="text"
+                    placeholder="e.g. Tomatoes, Rice, Mangoes"
+                >
+
+            </div>
+
+
+            <div class="registration-note">
+                🌱 Your details will be saved directly to the
+                AgriConnect backend.
+            </div>
+
+
+            <button
+                id="submitFarmerBtn"
+                type="submit"
+                class="btn btn-primary full-width btn-large"
+            >
+                Register Farmer
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     PRODUCT DETAIL MODAL
+========================================================= -->
+
+<div
+    id="productModal"
+    class="modal-container"
+>
+
+    <div class="modal product-modal">
+
+        <button
+            class="close-btn product-modal-close"
+            data-close-modal="productModal"
+        >
+            ×
+        </button>
+
+
+        <div
+            id="productDetail"
+            class="product-detail"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

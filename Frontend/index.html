@@ -126,6 +126,10 @@
             </button>
 
 
+            <a href="farmer-login.html" class="auth-nav-link farmer-link">👨‍🌾 Farmer</a>
+
+            <a href="buyer-login.html" class="auth-nav-link buyer-link">🛒 Buyer</a>
+
             <button
                 id="mobileMenuBtn"
                 class="mobile-menu-btn"
@@ -198,12 +202,13 @@
                 </a>
 
 
-                <button
+                <a
+                    href="farmer-register.html"
                     id="heroFarmerBtn"
                     class="btn btn-outline btn-large"
                 >
                     👨‍🌾 Join as Farmer
-                </button>
+                </a>
 
             </div>
 
@@ -538,12 +543,13 @@
             </div>
 
 
-            <button
+            <a
+                href="farmer-register.html"
                 id="registerFarmerBtn"
                 class="btn btn-primary btn-large"
             >
                 Register as Farmer →
-            </button>
+            </a>
 
         </div>
 
@@ -971,8 +977,16 @@
                 My Orders
             </a>
 
-            <a href="#farmers">
+            <a href="farmer-register.html">
                 Become a Farmer
+            </a>
+
+            <a href="farmer-login.html">
+                Farmer Login
+            </a>
+
+            <a href="buyer-login.html">
+                Buyer Login
             </a>
 
         </div>
@@ -1286,131 +1300,6 @@
                 class="btn btn-primary full-width btn-large"
             >
                 Place Order
-            </button>
-
-        </form>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================================
-     FARMER REGISTRATION MODAL
-========================================================= -->
-
-<div
-    id="farmerModal"
-    class="modal-container"
->
-
-    <div class="modal">
-
-        <div class="modal-header">
-
-            <div>
-                <span class="section-label">
-                    FARMER REGISTRATION
-                </span>
-
-                <h2>
-                    Join AgriConnect
-                </h2>
-            </div>
-
-            <button
-                class="close-btn"
-                data-close-modal="farmerModal"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <form id="farmerForm">
-
-            <div class="form-group">
-
-                <label>
-                    Farmer / Farm Name
-                </label>
-
-                <input
-                    id="farmerName"
-                    required
-                    type="text"
-                    placeholder="e.g. Green Valley Farms"
-                >
-
-            </div>
-
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>
-                        Phone Number
-                    </label>
-
-                    <input
-                        id="farmerPhone"
-                        required
-                        type="tel"
-                        placeholder="10-digit number"
-                        pattern="[0-9]{10}"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Location
-                    </label>
-
-                    <input
-                        id="farmerLocation"
-                        required
-                        type="text"
-                        placeholder="e.g. Nadia, WB"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Main Produce
-                </label>
-
-                <input
-                    id="farmerProduce"
-                    required
-                    type="text"
-                    placeholder="e.g. Tomatoes, Rice, Mangoes"
-                >
-
-            </div>
-
-
-            <div class="registration-note">
-                🌱 Your details will be saved directly to the
-                AgriConnect backend.
-            </div>
-
-
-            <button
-                id="submitFarmerBtn"
-                type="submit"
-                class="btn btn-primary full-width btn-large"
-            >
-                Register Farmer
             </button>
 
         </form>

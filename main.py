@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import random
 import threading
+import hashlib
 
 import joblib
 import numpy as np
@@ -184,7 +185,7 @@ SEED_PRODUCTS = [
      "rating": 4.7, "badge": "Fresh Today"},
 ]
 
-EMPTY_DB = {"products": SEED_PRODUCTS, "orders": [], "farmers": []}
+EMPTY_DB = {"products": SEED_PRODUCTS, "orders": [], "farmers": [], "buyers": []}
 
 
 # ============================================================
@@ -272,6 +273,15 @@ class FarmerCreate(BaseModel):
 class Farmer(FarmerCreate):
     id: int
     created_at: str
+
+
+class FarmerAuthCreate(FarmerCreate):
+    password: str = Field(min_length=6)
+
+
+class LoginRequest(BaseModel):
+    phone: str
+    password: str
 
 
 class RouteRequest(BaseModel):
@@ -420,6 +430,78 @@ def register_farmer(farmer: FarmerCreate):
     db["farmers"].append(new_farmer)
     write_db(db)
     return new_farmer
+
+
+# ============================================================
+# AUTHENTICATION
+# ============================================================
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+
+def find_user_by_phone(db: dict, phone: str, role: str):
+    phone = phone.strip()
+    if role == "farmer":
+        for farmer in db.get("farmers", []):
+            if farmer.get("phone") == phone:
+                return farmer
+        return None
+
+    for buyer in db.get("buyers", []):
+        if buyer.get("phone") == phone:
+            return buyer
+    return None
+
+
+@app.post("/auth/farmer/register")
+def auth_register_farmer(farmer: FarmerAuthCreate):
+    db = read_db()
+    if find_user_by_phone(db, farmer.phone, "farmer"):
+        raise HTTPException(status_code=409, detail="A farmer account with this phone number already exists.")
+
+    new_farmer = farmer.model_dump(exclude={"password"})
+    new_farmer["id"] = next_id(db.get("farmers", []))
+    new_farmer["created_at"] = datetime.utcnow().isoformat()
+    new_farmer["password_hash"] = hash_password(farmer.password)
+    db.setdefault("farmers", []).append(new_farmer)
+    write_db(db)
+    return {"message": "Farmer account created successfully", "farmer_id": new_farmer["id"]}
+
+
+@app.post("/auth/farmer/login")
+def auth_login_farmer(login: LoginRequest):
+    db = read_db()
+    farmer = find_user_by_phone(db, login.phone, "farmer")
+    if not farmer or farmer.get("password_hash") != hash_password(login.password):
+        raise HTTPException(status_code=401, detail="Invalid farmer phone number or password.")
+    return {"role": "farmer", "id": farmer["id"], "name": farmer["name"], "phone": farmer["phone"]}
+
+
+@app.post("/auth/buyer/register")
+def auth_register_buyer(payload: dict):
+    db = read_db()
+    phone = str(payload.get("phone", "")).strip()
+    name = str(payload.get("name", "")).strip()
+    password = str(payload.get("password", ""))
+    if not name or len(phone) != 10 or not phone.isdigit() or len(password) < 6:
+        raise HTTPException(status_code=422, detail="Name, valid 10-digit phone and 6+ character password are required.")
+    if find_user_by_phone(db, phone, "buyer"):
+        raise HTTPException(status_code=409, detail="A buyer account with this phone number already exists.")
+    buyers = db.setdefault("buyers", [])
+    buyer = {"id": next_id(buyers), "name": name, "phone": phone, "password_hash": hash_password(password), "created_at": datetime.utcnow().isoformat()}
+    buyers.append(buyer)
+    write_db(db)
+    return {"message": "Buyer account created successfully", "buyer_id": buyer["id"]}
+
+
+@app.post("/auth/buyer/login")
+def auth_login_buyer(login: LoginRequest):
+    db = read_db()
+    buyer = find_user_by_phone(db, login.phone, "buyer")
+    if not buyer or buyer.get("password_hash") != hash_password(login.password):
+        raise HTTPException(status_code=401, detail="Invalid buyer phone number or password.")
+    return {"role": "buyer", "id": buyer["id"], "name": buyer["name"], "phone": buyer["phone"]}
 
 
 # ============================================================

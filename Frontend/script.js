@@ -1115,25 +1115,6 @@ function initializeForms() {
         );
 
 
-    $("#farmerForm")
-        .addEventListener(
-            "submit",
-            registerFarmer
-        );
-
-
-    $("#heroFarmerBtn")
-        .addEventListener(
-            "click",
-            () => openModal("farmerModal")
-        );
-
-
-    $("#registerFarmerBtn")
-        .addEventListener(
-            "click",
-            () => openModal("farmerModal")
-        );
 }
 
 
@@ -1258,86 +1239,9 @@ async function submitOrder(event) {
 
 /* =========================================================
    FARMER REGISTRATION
+
+   Farmer registration now lives on farmer-register.html.
 ========================================================= */
-
-async function registerFarmer(event) {
-
-    event.preventDefault();
-
-
-    const button =
-        $("#submitFarmerBtn");
-
-
-    const farmerData = {
-
-        name:
-            $("#farmerName").value.trim(),
-
-        phone:
-            $("#farmerPhone").value.trim(),
-
-        location:
-            $("#farmerLocation").value.trim(),
-
-        produce:
-            $("#farmerProduce").value.trim()
-
-    };
-
-
-    setButtonLoading(
-        button,
-        "Registering..."
-    );
-
-
-    try {
-
-        const farmer =
-            await apiRequest(
-                "/farmers",
-                {
-                    method: "POST",
-                    body:
-                        JSON.stringify(
-                            farmerData
-                        )
-                }
-            );
-
-
-        showToast(
-            `Welcome to AgriConnect, ${farmer.name}! 🌱`
-        );
-
-
-        event.target.reset();
-
-        closeModal("farmerModal");
-
-
-        await refreshDashboard();
-
-    }
-
-    catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-    finally {
-
-        resetButton(
-            button,
-            "Register Farmer"
-        );
-    }
-}
 
 
 /* =========================================================

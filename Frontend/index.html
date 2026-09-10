@@ -126,10 +126,6 @@
             </button>
 
 
-            <a href="farmer-login.html" class="auth-nav-link farmer-link">👨‍🌾 Farmer</a>
-
-            <a href="buyer-login.html" class="auth-nav-link buyer-link">🛒 Buyer</a>
-
             <button
                 id="mobileMenuBtn"
                 class="mobile-menu-btn"
@@ -202,13 +198,12 @@
                 </a>
 
 
-                <a
-                    href="farmer-register.html"
+                <button
                     id="heroFarmerBtn"
                     class="btn btn-outline btn-large"
                 >
                     👨‍🌾 Join as Farmer
-                </a>
+                </button>
 
             </div>
 
@@ -543,13 +538,12 @@
             </div>
 
 
-            <a
-                href="farmer-register.html"
+            <button
                 id="registerFarmerBtn"
                 class="btn btn-primary btn-large"
             >
                 Register as Farmer →
-            </a>
+            </button>
 
         </div>
 
@@ -843,7 +837,8 @@
                     <input
                         id="routeOrigin"
                         type="text"
-                        placeholder="e.g. Nadia, WB"
+                        list="routeLocations"
+                        placeholder="e.g. Nadia"
                     >
 
 
@@ -856,6 +851,33 @@
                         rows="3"
                         placeholder="Enter destinations separated by commas&#10;e.g. Kolkata, Hooghly, Howrah"
                     ></textarea>
+
+                    <datalist id="routeLocations">
+                        <option value="Raipur"></option>
+                        <option value="Durg"></option>
+                        <option value="Bhilai"></option>
+                        <option value="Balod"></option>
+                        <option value="Bemetara"></option>
+                        <option value="Rajnandgaon"></option>
+                        <option value="Bilaspur"></option>
+                        <option value="Korba"></option>
+                        <option value="Mahasamund"></option>
+                        <option value="Dhamtari"></option>
+                        <option value="Jagdalpur"></option>
+                        <option value="Kanker"></option>
+                        <option value="Kawardha"></option>
+                        <option value="Janjgir"></option>
+                        <option value="Raigarh"></option>
+                        <option value="Ambikapur"></option>
+                        <option value="Kolkata"></option>
+                        <option value="Nadia"></option>
+                        <option value="Hooghly"></option>
+                        <option value="Howrah"></option>
+                        <option value="Malda"></option>
+                        <option value="Burdwan"></option>
+                        <option value="Barasat"></option>
+                        <option value="Birbhum"></option>
+                    </datalist>
 
                 </div>
 
@@ -977,16 +999,8 @@
                 My Orders
             </a>
 
-            <a href="farmer-register.html">
+            <a href="#farmers">
                 Become a Farmer
-            </a>
-
-            <a href="farmer-login.html">
-                Farmer Login
-            </a>
-
-            <a href="buyer-login.html">
-                Buyer Login
             </a>
 
         </div>
@@ -1300,6 +1314,131 @@
                 class="btn btn-primary full-width btn-large"
             >
                 Place Order
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FARMER REGISTRATION MODAL
+========================================================= -->
+
+<div
+    id="farmerModal"
+    class="modal-container"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+                <span class="section-label">
+                    FARMER REGISTRATION
+                </span>
+
+                <h2>
+                    Join AgriConnect
+                </h2>
+            </div>
+
+            <button
+                class="close-btn"
+                data-close-modal="farmerModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="farmerForm">
+
+            <div class="form-group">
+
+                <label>
+                    Farmer / Farm Name
+                </label>
+
+                <input
+                    id="farmerName"
+                    required
+                    type="text"
+                    placeholder="e.g. Green Valley Farms"
+                >
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Phone Number
+                    </label>
+
+                    <input
+                        id="farmerPhone"
+                        required
+                        type="tel"
+                        placeholder="10-digit number"
+                        pattern="[0-9]{10}"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Location
+                    </label>
+
+                    <input
+                        id="farmerLocation"
+                        required
+                        type="text"
+                        placeholder="e.g. Nadia, WB"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Main Produce
+                </label>
+
+                <input
+                    id="farmerProduce"
+                    required
+                    type="text"
+                    placeholder="e.g. Tomatoes, Rice, Mangoes"
+                >
+
+            </div>
+
+
+            <div class="registration-note">
+                🌱 Your details will be saved directly to the
+                AgriConnect backend.
+            </div>
+
+
+            <button
+                id="submitFarmerBtn"
+                type="submit"
+                class="btn btn-primary full-width btn-large"
+            >
+                Register Farmer
             </button>
 
         </form>

@@ -23,7 +23,8 @@ from __future__ import annotations
 import json
 import random
 import threading
-import hashlib
+import math
+import heapq
 
 import joblib
 import numpy as np
@@ -185,7 +186,7 @@ SEED_PRODUCTS = [
      "rating": 4.7, "badge": "Fresh Today"},
 ]
 
-EMPTY_DB = {"products": SEED_PRODUCTS, "orders": [], "farmers": [], "buyers": []}
+EMPTY_DB = {"products": SEED_PRODUCTS, "orders": [], "farmers": []}
 
 
 # ============================================================
@@ -273,15 +274,6 @@ class FarmerCreate(BaseModel):
 class Farmer(FarmerCreate):
     id: int
     created_at: str
-
-
-class FarmerAuthCreate(FarmerCreate):
-    password: str = Field(min_length=6)
-
-
-class LoginRequest(BaseModel):
-    phone: str
-    password: str
 
 
 class RouteRequest(BaseModel):
@@ -433,78 +425,6 @@ def register_farmer(farmer: FarmerCreate):
 
 
 # ============================================================
-# AUTHENTICATION
-# ============================================================
-
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
-
-
-def find_user_by_phone(db: dict, phone: str, role: str):
-    phone = phone.strip()
-    if role == "farmer":
-        for farmer in db.get("farmers", []):
-            if farmer.get("phone") == phone:
-                return farmer
-        return None
-
-    for buyer in db.get("buyers", []):
-        if buyer.get("phone") == phone:
-            return buyer
-    return None
-
-
-@app.post("/auth/farmer/register")
-def auth_register_farmer(farmer: FarmerAuthCreate):
-    db = read_db()
-    if find_user_by_phone(db, farmer.phone, "farmer"):
-        raise HTTPException(status_code=409, detail="A farmer account with this phone number already exists.")
-
-    new_farmer = farmer.model_dump(exclude={"password"})
-    new_farmer["id"] = next_id(db.get("farmers", []))
-    new_farmer["created_at"] = datetime.utcnow().isoformat()
-    new_farmer["password_hash"] = hash_password(farmer.password)
-    db.setdefault("farmers", []).append(new_farmer)
-    write_db(db)
-    return {"message": "Farmer account created successfully", "farmer_id": new_farmer["id"]}
-
-
-@app.post("/auth/farmer/login")
-def auth_login_farmer(login: LoginRequest):
-    db = read_db()
-    farmer = find_user_by_phone(db, login.phone, "farmer")
-    if not farmer or farmer.get("password_hash") != hash_password(login.password):
-        raise HTTPException(status_code=401, detail="Invalid farmer phone number or password.")
-    return {"role": "farmer", "id": farmer["id"], "name": farmer["name"], "phone": farmer["phone"]}
-
-
-@app.post("/auth/buyer/register")
-def auth_register_buyer(payload: dict):
-    db = read_db()
-    phone = str(payload.get("phone", "")).strip()
-    name = str(payload.get("name", "")).strip()
-    password = str(payload.get("password", ""))
-    if not name or len(phone) != 10 or not phone.isdigit() or len(password) < 6:
-        raise HTTPException(status_code=422, detail="Name, valid 10-digit phone and 6+ character password are required.")
-    if find_user_by_phone(db, phone, "buyer"):
-        raise HTTPException(status_code=409, detail="A buyer account with this phone number already exists.")
-    buyers = db.setdefault("buyers", [])
-    buyer = {"id": next_id(buyers), "name": name, "phone": phone, "password_hash": hash_password(password), "created_at": datetime.utcnow().isoformat()}
-    buyers.append(buyer)
-    write_db(db)
-    return {"message": "Buyer account created successfully", "buyer_id": buyer["id"]}
-
-
-@app.post("/auth/buyer/login")
-def auth_login_buyer(login: LoginRequest):
-    db = read_db()
-    buyer = find_user_by_phone(db, login.phone, "buyer")
-    if not buyer or buyer.get("password_hash") != hash_password(login.password):
-        raise HTTPException(status_code=401, detail="Invalid buyer phone number or password.")
-    return {"role": "buyer", "id": buyer["id"], "name": buyer["name"], "phone": buyer["phone"]}
-
-
-# ============================================================
 # AI DEMAND FORECAST  (GET /forecast)
 # ============================================================
 
@@ -640,28 +560,275 @@ def get_forecast(region: Optional[str] = None, crop: Optional[str] = None):
 
 
 # ============================================================
-# AI ROUTE OPTIMIZATION  (POST /optimize-route)
+# SMART ROUTE OPTIMIZATION
 # ============================================================
+
+# Coordinates used by the route optimizer.  The frontend accepts
+# these names; adding another place only requires adding its coordinates.
+LOCATION_COORDINATES = {
+    # Chhattisgarh
+    "Raipur": (21.2514, 81.6296),
+    "Durg": (21.1904, 81.2849),
+    "Bhilai": (21.1938, 81.3509),
+    "Balod": (20.7308, 81.2054),
+    "Bemetara": (21.7156, 81.5340),
+    "Rajnandgaon": (21.0972, 81.0287),
+    "Bilaspur": (22.0797, 82.1409),
+    "Korba": (22.3595, 82.7501),
+    "Mahasamund": (21.1092, 82.0973),
+    "Dhamtari": (20.7074, 81.5498),
+    "Jagdalpur": (19.0748, 82.0090),
+    "Kanker": (20.2719, 81.4917),
+    "Kawardha": (22.0085, 81.2244),
+    "Janjgir": (21.9700, 82.5800),
+    "Raigarh": (21.8974, 83.3950),
+    "Ambikapur": (23.1355, 83.1811),
+
+    # West Bengal locations already used by AgriConnect seed products
+    "Kolkata": (22.5726, 88.3639),
+    "Nadia": (23.4058, 88.5245),
+    "Hooghly": (22.8956, 88.4025),
+    "Howrah": (22.5958, 88.2636),
+    "Malda": (25.0108, 88.1411),
+    "Burdwan": (23.2324, 87.8615),
+    "Barasat": (22.7215, 88.4829),
+    "Birbhum": (23.8402, 87.6186),
+}
+
+
+def normalize_location_name(location: str) -> str:
+    """Normalize common user-entered location variations."""
+    value = " ".join(location.strip().split())
+
+    aliases = {
+        "Raipur, CG": "Raipur",
+        "Raipur, Chhattisgarh": "Raipur",
+        "Durg, CG": "Durg",
+        "Bhilai, CG": "Bhilai",
+        "Nadia, WB": "Nadia",
+        "Hooghly, WB": "Hooghly",
+        "Howrah, WB": "Howrah",
+        "Malda, WB": "Malda",
+        "Burdwan, WB": "Burdwan",
+        "Barasat, WB": "Barasat",
+        "Birbhum, WB": "Birbhum",
+        "Kolkata, WB": "Kolkata",
+    }
+
+    return aliases.get(value, value)
+
+
+def haversine_distance(coord1, coord2) -> float:
+    """Return geographical distance between two coordinates in km."""
+    lat1, lon1 = coord1
+    lat2, lon2 = coord2
+
+    earth_radius_km = 6371.0
+
+    lat1 = math.radians(lat1)
+    lat2 = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+
+    a = (
+        math.sin(delta_lat / 2) ** 2
+        + math.cos(lat1)
+        * math.cos(lat2)
+        * math.sin(delta_lon / 2) ** 2
+    )
+
+    return earth_radius_km * 2 * math.atan2(
+        math.sqrt(a),
+        math.sqrt(1 - a),
+    )
+
+
+def build_location_graph(locations: list[str]) -> dict[str, list[tuple[str, float]]]:
+    """Build a weighted geographical graph from the supplied locations."""
+    graph = {location: [] for location in locations}
+
+    for i, location_a in enumerate(locations):
+        for location_b in locations[i + 1:]:
+            distance = haversine_distance(
+                LOCATION_COORDINATES[location_a],
+                LOCATION_COORDINATES[location_b],
+            )
+            graph[location_a].append((location_b, distance))
+            graph[location_b].append((location_a, distance))
+
+    return graph
+
+
+def dijkstra(graph: dict, start: str, end: str) -> tuple[float, list[str]]:
+    """Return shortest distance and path from start to end."""
+    distances = {node: float("inf") for node in graph}
+    previous = {node: None for node in graph}
+    distances[start] = 0.0
+
+    queue = [(0.0, start)]
+
+    while queue:
+        current_distance, current_node = heapq.heappop(queue)
+
+        if current_distance > distances[current_node]:
+            continue
+
+        if current_node == end:
+            break
+
+        for neighbor, weight in graph[current_node]:
+            candidate = current_distance + weight
+
+            if candidate < distances[neighbor]:
+                distances[neighbor] = candidate
+                previous[neighbor] = current_node
+                heapq.heappush(queue, (candidate, neighbor))
+
+    if distances[end] == float("inf"):
+        return float("inf"), []
+
+    path = []
+    current = end
+
+    while current is not None:
+        path.append(current)
+        current = previous[current]
+
+    path.reverse()
+    return distances[end], path
+
+
+@app.get("/route/options")
+def get_route_options():
+    """Return supported locations for the route UI."""
+    return {
+        "locations": sorted(LOCATION_COORDINATES.keys()),
+        "algorithm": "Dijkstra + Haversine",
+    }
+
 
 @app.post("/optimize-route")
 def optimize_route(request: RouteRequest):
+    """Optimize a multi-stop delivery route using Dijkstra's algorithm."""
+    if not request.origin.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Starting point is required.",
+        )
+
     if not request.destinations:
-        raise HTTPException(status_code=400, detail="At least one destination is required")
+        raise HTTPException(
+            status_code=400,
+            detail="At least one destination is required.",
+        )
 
-    # Simple simulated "optimization": shuffle destinations deterministically
-    # by name length + alphabetical order to produce a plausible-looking
-    # optimized route. Swap this out for a real routing/ML service later.
-    ordered = sorted(request.destinations, key=lambda d: (len(d), d))
+    origin = normalize_location_name(request.origin)
+    destinations = [
+        normalize_location_name(destination)
+        for destination in request.destinations
+        if destination.strip()
+    ]
 
-    distance = round(random.uniform(20, 120), 1)
-    time_minutes = round(distance * random.uniform(1.2, 1.8))
-    fuel_saved = random.randint(10, 25)
+    # Remove duplicates and don't treat the origin as a delivery stop.
+    destinations = list(dict.fromkeys(destinations))
+    destinations = [d for d in destinations if d != origin]
 
-    route_str = " → ".join([request.origin] + ordered)
+    if not destinations:
+        raise HTTPException(
+            status_code=400,
+            detail="Choose at least one destination different from the origin.",
+        )
+
+    locations = [origin] + destinations
+
+    unknown = [
+        location
+        for location in locations
+        if location not in LOCATION_COORDINATES
+    ]
+
+    if unknown:
+        supported = ", ".join(sorted(LOCATION_COORDINATES.keys()))
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Location not supported: "
+                + ", ".join(unknown)
+                + ". Please choose a location from the supported list. "
+                + "Supported locations: "
+                + supported
+            ),
+        )
+
+    graph = build_location_graph(locations)
+
+    # Greedy multi-stop sequencing, with Dijkstra used for every leg.
+    # This keeps the implementation lightweight while each leg is an
+    # actual shortest-path calculation rather than a random simulation.
+    current = origin
+    remaining = destinations.copy()
+    optimized_route = [origin]
+    total_distance = 0.0
+
+    while remaining:
+        best_destination = None
+        best_distance = float("inf")
+        best_path = []
+
+        for destination in remaining:
+            distance, path = dijkstra(graph, current, destination)
+
+            if distance < best_distance:
+                best_distance = distance
+                best_destination = destination
+                best_path = path
+
+        if best_destination is None or not best_path:
+            raise HTTPException(
+                status_code=500,
+                detail="Could not calculate a route between the selected locations.",
+            )
+
+        optimized_route.extend(best_path[1:])
+        total_distance += best_distance
+        current = best_destination
+        remaining.remove(best_destination)
+
+    # Compare against the exact order entered by the user.
+    original_route = [origin] + destinations
+    original_distance = 0.0
+
+    for i in range(len(original_route) - 1):
+        original_distance += haversine_distance(
+            LOCATION_COORDINATES[original_route[i]],
+            LOCATION_COORDINATES[original_route[i + 1]],
+        )
+
+    distance_saved = max(0.0, original_distance - total_distance)
+    savings_percentage = (
+        (distance_saved / original_distance) * 100
+        if original_distance > 0
+        else 0.0
+    )
+
+    # Practical estimates for a small agricultural delivery vehicle.
+    average_speed_kmh = 40.0
+    mileage_km_per_litre = 18.0
+
+    time_minutes = round((total_distance / average_speed_kmh) * 60)
+    fuel_used = total_distance / mileage_km_per_litre
 
     return {
-        "distance": distance,
+        "distance": round(total_distance, 2),
         "time": time_minutes,
-        "fuel_saved": fuel_saved,
-        "route": route_str,
+        "fuel_used": round(fuel_used, 2),
+        "fuel_saved": round(distance_saved / mileage_km_per_litre, 2),
+        "original_distance": round(original_distance, 2),
+        "distance_saved": round(distance_saved, 2),
+        "savings_percentage": round(savings_percentage, 1),
+        "route": " → ".join(optimized_route),
+        "stops": optimized_route,
+        "algorithm": "Dijkstra + Haversine",
+        "average_speed": average_speed_kmh,
+        "message": "Route calculated from geographical coordinates using Dijkstra's shortest-path algorithm.",
     }

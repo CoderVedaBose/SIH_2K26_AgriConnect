@@ -3449,3 +3449,45 @@ body.dark .recommendation {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* =========================================================
+   REAL ROUTE OPTIMIZATION RESULT
+========================================================= */
+
+.route-savings {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--green-100);
+    color: var(--green-800);
+    font-size: 0.72rem;
+    line-height: 1.8;
+}
+
+body.dark .route-savings {
+    color: #a6e6bb;
+}
+
+.route-result-title {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+}
+
+.route-result-route {
+    font-size: 0.8rem;
+    line-height: 1.8;
+    font-weight: 800;
+}
+
+.route-error {
+    padding: 12px;
+    border-radius: 10px;
+    background: var(--red-100);
+    color: var(--red-500);
+    font-size: 0.75rem;
+    line-height: 1.6;
+}

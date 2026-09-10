@@ -1115,6 +1115,25 @@ function initializeForms() {
         );
 
 
+    $("#farmerForm")
+        .addEventListener(
+            "submit",
+            registerFarmer
+        );
+
+
+    $("#heroFarmerBtn")
+        .addEventListener(
+            "click",
+            () => openModal("farmerModal")
+        );
+
+
+    $("#registerFarmerBtn")
+        .addEventListener(
+            "click",
+            () => openModal("farmerModal")
+        );
 }
 
 
@@ -1239,9 +1258,86 @@ async function submitOrder(event) {
 
 /* =========================================================
    FARMER REGISTRATION
-
-   Farmer registration now lives on farmer-register.html.
 ========================================================= */
+
+async function registerFarmer(event) {
+
+    event.preventDefault();
+
+
+    const button =
+        $("#submitFarmerBtn");
+
+
+    const farmerData = {
+
+        name:
+            $("#farmerName").value.trim(),
+
+        phone:
+            $("#farmerPhone").value.trim(),
+
+        location:
+            $("#farmerLocation").value.trim(),
+
+        produce:
+            $("#farmerProduce").value.trim()
+
+    };
+
+
+    setButtonLoading(
+        button,
+        "Registering..."
+    );
+
+
+    try {
+
+        const farmer =
+            await apiRequest(
+                "/farmers",
+                {
+                    method: "POST",
+                    body:
+                        JSON.stringify(
+                            farmerData
+                        )
+                }
+            );
+
+
+        showToast(
+            `Welcome to AgriConnect, ${farmer.name}! 🌱`
+        );
+
+
+        event.target.reset();
+
+        closeModal("farmerModal");
+
+
+        await refreshDashboard();
+
+    }
+
+    catch (error) {
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
+    finally {
+
+        resetButton(
+            button,
+            "Register Farmer"
+        );
+    }
+}
 
 
 /* =========================================================
@@ -1702,169 +1798,100 @@ async function generateForecast() {
 
 async function optimizeRoute() {
 
-    const button =
-        $("#optimizeRouteBtn");
+    const button = $("#optimizeRouteBtn");
+    const container = $("#routeResult");
 
-
-    const origin =
-        $("#routeOrigin")
-            .value
-            .trim();
-
-
-    const destinationText =
-        $("#routeDestinations")
-            .value
-            .trim();
-
+    const origin = $("#routeOrigin").value.trim();
+    const destinationText = $("#routeDestinations").value.trim();
 
     if (!origin) {
-
-        showToast(
-            "Please enter a starting point.",
-            "warning"
-        );
-
+        showToast("Please enter a starting point.", "warning");
         return;
     }
-
 
     if (!destinationText) {
-
-        showToast(
-            "Please enter at least one destination.",
-            "warning"
-        );
-
+        showToast("Please enter at least one destination.", "warning");
         return;
     }
 
-
-    const destinations =
-        destinationText
-            .split(",")
-            .map(item => item.trim())
-            .filter(Boolean);
-
+    const destinations = destinationText
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean);
 
     if (!destinations.length) {
-
-        showToast(
-            "Please enter valid destinations.",
-            "warning"
-        );
-
+        showToast("Please enter valid destinations.", "warning");
         return;
     }
 
-
-    setButtonLoading(
-        button,
-        "Optimizing..."
-    );
-
+    setButtonLoading(button, "Calculating...");
 
     try {
+        const data = await apiRequest("/optimize-route", {
+            method: "POST",
+            body: JSON.stringify({
+                origin,
+                destinations
+            })
+        });
 
-        const result =
-            await apiRequest(
-                "/optimize-route",
-                {
-                    method: "POST",
-
-                    body: JSON.stringify({
-                        origin,
-                        destinations
-                    })
-                }
-            );
-
-
-        const container =
-            $("#routeResult");
-
-
-        container.classList.remove(
-            "hidden"
-        );
-
+        container.classList.remove("hidden");
 
         container.innerHTML = `
-
             <div class="route-stats">
 
                 <div class="route-stat">
-
-                    <strong>
-                        ${result.distance} km
-                    </strong>
-
-                    <span>
-                        Distance
-                    </span>
-
+                    <strong>${Number(data.distance).toFixed(2)} km</strong>
+                    <span>Total Distance</span>
                 </div>
 
-
                 <div class="route-stat">
-
-                    <strong>
-                        ${result.time} min
-                    </strong>
-
-                    <span>
-                        Est. Time
-                    </span>
-
+                    <strong>${data.time} min</strong>
+                    <span>Estimated Time</span>
                 </div>
 
-
                 <div class="route-stat">
-
-                    <strong>
-                        ${result.fuel_saved}%
-                    </strong>
-
-                    <span>
-                        Fuel Saved
-                    </span>
-
+                    <strong>${Number(data.fuel_used).toFixed(2)} L</strong>
+                    <span>Estimated Fuel</span>
                 </div>
 
             </div>
-
 
             <div class="route-path">
-                🏁 ${escapeHTML(result.route)}
+                <div class="route-result-title">
+                    🧭 Optimized Route
+                </div>
+                <div class="route-result-route">
+                    ${escapeHTML(data.route)}
+                </div>
             </div>
 
+            <div class="route-savings">
+                📉 Compared with your entered order:
+                <strong>${Number(data.distance_saved).toFixed(2)} km</strong>
+                saved (${Number(data.savings_percentage).toFixed(1)}%).
+                <br>
+                ⛽ Approx. fuel saved:
+                <strong>${Number(data.fuel_saved).toFixed(2)} L</strong>
+                <br>
+                ⚙️ ${escapeHTML(data.algorithm)}
+            </div>
         `;
 
+        showToast("Route calculated successfully 🚚");
 
-        showToast(
-            "Route optimized successfully 🚚"
-        );
-
-    }
-
-    catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-    finally {
-
-        resetButton(
-            button,
-            "🚀 Optimize Route"
-        );
+    } catch (error) {
+        container.classList.remove("hidden");
+        container.innerHTML = `
+            <div class="route-error">
+                ⚠️ ${escapeHTML(error.message)}
+            </div>
+        `;
+        showToast(error.message, "error");
+    } finally {
+        resetButton(button, "🚀 Optimize Route");
     }
 }
-
 
 /* =========================================================
    PRODUCT DETAIL MODAL

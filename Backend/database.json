@@ -89,7 +89,32 @@
       "badge": "Fresh Today"
     }
   ],
-  "orders": [],
+  "orders": [
+    {
+      "customer_name": "Bedanto Bose",
+      "phone": "8981368075",
+      "address": "jjjjl",
+      "payment_method": "Cash on Delivery",
+      "items": [
+        {
+          "product_id": 4,
+          "quantity": 1
+        },
+        {
+          "product_id": 3,
+          "quantity": 1
+        },
+        {
+          "product_id": 2,
+          "quantity": 1
+        }
+      ],
+      "id": 1,
+      "total": 215.0,
+      "status": "Placed",
+      "created_at": "2026-09-10T18:11:48.642809"
+    }
+  ],
   "farmers": [
     {
       "name": "Bedanto Bose",

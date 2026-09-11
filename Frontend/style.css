@@ -3406,7 +3406,8 @@ body.dark .recommendation {
     letter-spacing: 0.7px;
 }
 
-.forecast-field select {
+.forecast-field select,
+.forecast-field input[type="month"] {
     width: 100%;
     min-height: 43px;
     padding: 9px 12px;
@@ -3421,12 +3422,14 @@ body.dark .recommendation {
     transition: var(--transition);
 }
 
-.forecast-field select:focus {
+.forecast-field select:focus,
+.forecast-field input[type="month"]:focus {
     border-color: var(--green-500);
     box-shadow: 0 0 0 3px rgba(60,166,107,0.10);
 }
 
-.forecast-field select:disabled {
+.forecast-field select:disabled,
+.forecast-field input[type="month"]:disabled {
     opacity: 0.65;
     cursor: not-allowed;
 }
@@ -3490,4 +3493,118 @@ body.dark .route-savings {
     color: var(--red-500);
     font-size: 0.75rem;
     line-height: 1.6;
+}
+
+
+/* =========================================================
+   REAL ROUTE MAP
+   Added without changing the demand forecasting styles.
+========================================================= */
+
+.route-map-wrap {
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface);
+}
+
+.route-map-header {
+    min-height: 52px;
+    padding: 11px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--surface);
+}
+
+.route-map-header > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.route-map-header strong {
+    font-size: 0.78rem;
+}
+
+.route-map-header span {
+    font-size: 0.62rem;
+    color: var(--text-soft);
+}
+
+.route-map-badge {
+    flex-shrink: 0;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: var(--green-100);
+    color: var(--green-700) !important;
+    font-size: 0.55rem !important;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+.route-map {
+    width: 100%;
+    height: 330px;
+    min-height: 260px;
+    z-index: 1;
+    background: var(--bg);
+}
+
+.route-stop-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.route-stop {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--bg);
+    font-size: 0.72rem;
+}
+
+.route-stop-number {
+    width: 23px;
+    height: 23px;
+    flex: 0 0 23px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--orange-100);
+    color: var(--orange-600);
+    font-size: 0.62rem;
+    font-weight: 900;
+}
+
+.leaflet-container {
+    font-family: "DM Sans", sans-serif;
+}
+
+.leaflet-popup-content {
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+
+    .route-map {
+        height: 280px;
+        min-height: 230px;
+    }
+
+    .route-map-header {
+        align-items: flex-start;
+    }
+
+    .route-map-badge {
+        font-size: 0.5rem !important;
+    }
+
 }

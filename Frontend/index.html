@@ -17,6 +17,13 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <!-- Leaflet: real OpenStreetMap map rendering -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin=""
+    >
+
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com"
@@ -778,6 +785,15 @@
                         </select>
                     </div>
 
+                    <div class="forecast-field forecast-target-field">
+                        <label for="forecastTargetMonth">Forecast For</label>
+                        <input
+                            type="month"
+                            id="forecastTargetMonth"
+                            disabled
+                        >
+                    </div>
+
                 </div>
 
 
@@ -1476,6 +1492,12 @@
 
 </div>
 
+
+<!-- Leaflet: interactive OpenStreetMap map -->
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    crossorigin=""
+></script>
 
 <script src="script.js"></script>
 

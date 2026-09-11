@@ -1563,6 +1563,12 @@ function initializeAITools() {
             updateForecastCrops
         );
 
+    $("#forecastCrop")
+        .addEventListener(
+            "change",
+            updateForecastMonths
+        );
+
     loadForecastOptions();
 
 
@@ -1663,7 +1669,99 @@ function updateForecastCrops() {
 
     if (crops.length) {
         cropSelect.value = crops[0];
+        updateForecastMonths();
     }
+    else {
+        resetForecastMonths();
+    }
+}
+
+
+/* =========================================================
+   FORECAST DATE / MONTH SELECTION
+========================================================= */
+
+function resetForecastMonths() {
+
+    const targetSelect = $("#forecastTargetMonth");
+
+    if (!targetSelect) {
+        return;
+    }
+
+    targetSelect.value = "";
+    targetSelect.removeAttribute("min");
+    targetSelect.removeAttribute("max");
+    targetSelect.disabled = true;
+}
+
+
+function addMonthsToYearMonth(yearMonth, months) {
+
+    const [year, month] =
+        yearMonth.split("-").map(Number);
+
+    const date =
+        new Date(
+            year,
+            month - 1 + months,
+            1
+        );
+
+    return (
+        `${date.getFullYear()}-` +
+        `${String(date.getMonth() + 1).padStart(2, "0")}`
+    );
+}
+
+
+function updateForecastMonths() {
+
+    const region =
+        $("#forecastRegion").value;
+
+    const crop =
+        $("#forecastCrop").value;
+
+    const targetSelect =
+        $("#forecastTargetMonth");
+
+    if (!targetSelect) {
+        return;
+    }
+
+    if (!region || !crop) {
+        resetForecastMonths();
+        return;
+    }
+
+    const pair =
+        forecastPairs.find(
+            item =>
+                item.region === region &&
+                item.crop === crop
+        );
+
+    // If the backend supplies the latest historical date, use it as
+    // a sensible default. Otherwise fall back to the current month.
+    // No min/max is set on the picker — any past or future month/year
+    // can be freely chosen.
+    const latestYearMonth =
+        pair?.latest_date
+            ? String(pair.latest_date).slice(0, 7)
+            : (() => {
+                const now = new Date();
+                return (
+                    `${now.getFullYear()}-` +
+                    `${String(now.getMonth() + 1).padStart(2, "0")}`
+                );
+            })();
+
+    targetSelect.disabled = false;
+
+    // Default to the month right after the latest historical record.
+    targetSelect.value =
+        addMonthsToYearMonth(latestYearMonth, 1);
 }
 
 
@@ -1685,10 +1783,13 @@ async function generateForecast() {
     const crop =
         $("#forecastCrop").value;
 
-    if (!region || !crop) {
+    const targetMonth =
+        $("#forecastTargetMonth").value;
+
+    if (!region || !crop || !targetMonth) {
 
         showToast(
-            "Please select a region and crop.",
+            "Please select a region, crop and future month.",
             "warning"
         );
 
@@ -1703,7 +1804,9 @@ async function generateForecast() {
     try {
 
         const endpoint =
-            `/forecast?region=${encodeURIComponent(region)}&crop=${encodeURIComponent(crop)}`;
+            `/forecast?region=${encodeURIComponent(region)}`
+            + `&crop=${encodeURIComponent(crop)}`
+            + `&forecast_date=${encodeURIComponent(targetMonth)}`;
 
         const data =
             await apiRequest(endpoint);
@@ -1793,6 +1896,386 @@ async function generateForecast() {
 
 
 /* =========================================================
+   MAP ADDITION
+   LOAD LEAFLET
+========================================================= */
+
+let leafletLoadingPromise = null;
+
+
+function loadLeaflet() {
+
+    if (window.L) {
+        return Promise.resolve();
+    }
+
+
+    if (leafletLoadingPromise) {
+        return leafletLoadingPromise;
+    }
+
+
+    leafletLoadingPromise =
+        new Promise((resolve, reject) => {
+
+            // Load Leaflet CSS
+            if (!document.querySelector(
+                'link[data-agriconnect-leaflet="true"]'
+            )) {
+
+                const css =
+                    document.createElement("link");
+
+                css.rel = "stylesheet";
+
+                css.href =
+                    "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+
+                css.integrity =
+                    "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+
+                css.crossOrigin = "";
+
+                css.dataset.agriconnectLeaflet = "true";
+
+                document.head.appendChild(css);
+            }
+
+
+            // Load Leaflet JavaScript
+            const script =
+                document.createElement("script");
+
+            script.src =
+                "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+
+            script.integrity =
+                "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+
+            script.crossOrigin = "";
+
+            script.onload = () => resolve();
+
+            script.onerror = () =>
+                reject(
+                    new Error(
+                        "Could not load map library."
+                    )
+                );
+
+            document.head.appendChild(script);
+
+        });
+
+
+    return leafletLoadingPromise;
+}
+
+
+/* =========================================================
+   MAP ADDITION
+   MAP STATE
+========================================================= */
+
+let routeMap = null;
+
+let routeMapLayer = null;
+
+
+/* =========================================================
+   MAP ADDITION
+   CREATE MAP CONTAINER
+========================================================= */
+
+function createRouteMapContainer() {
+
+    let mapContainer =
+        document.getElementById("routeMap");
+
+
+    if (!mapContainer) {
+
+        const routeResult =
+            $("#routeResult");
+
+
+        if (!routeResult) {
+            return null;
+        }
+
+
+        mapContainer =
+            document.createElement("div");
+
+
+        mapContainer.id =
+            "routeMap";
+
+
+        routeResult.appendChild(
+            mapContainer
+        );
+    }
+
+
+    // Always (re)apply sizing/styling below, whether the div was just
+    // created here or already existed as a bare placeholder in the
+    // results HTML — a #routeMap div with no explicit height collapses
+    // to 0px and Leaflet silently renders nothing into it.
+    mapContainer.innerHTML = `
+        <div
+            style="
+                height:100%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:14px;
+                color:#666;
+            "
+        >
+            Loading map...
+        </div>
+    `;
+
+
+    mapContainer.style.width =
+        "100%";
+
+    mapContainer.style.height =
+        "420px";
+
+    mapContainer.style.marginTop =
+        "20px";
+
+    mapContainer.style.borderRadius =
+        "16px";
+
+    mapContainer.style.overflow =
+        "hidden";
+
+    mapContainer.style.border =
+        "1px solid rgba(0,0,0,0.1)";
+
+    mapContainer.style.position =
+        "relative";
+
+
+    return mapContainer;
+}
+
+
+/* =========================================================
+   MAP ADDITION
+   DISPLAY ROUTE MAP
+========================================================= */
+
+async function displayRouteMap(
+    locations,
+    routeData
+) {
+
+    const mapContainer =
+        createRouteMapContainer();
+
+
+    if (!mapContainer) {
+        return;
+    }
+
+
+    await loadLeaflet();
+
+
+    mapContainer.innerHTML = "";
+
+
+    if (routeMap) {
+
+        routeMap.remove();
+
+        routeMap = null;
+
+        routeMapLayer = null;
+    }
+
+
+    routeMap =
+        L.map(
+            mapContainer,
+            {
+                scrollWheelZoom: true
+            }
+        );
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution:
+                '&copy; OpenStreetMap contributors'
+        }
+    ).addTo(routeMap);
+
+
+    routeMapLayer =
+        L.geoJSON(
+            routeData.geometry,
+            {
+                style: {
+                    weight: 6,
+                    opacity: 0.85
+                }
+            }
+        ).addTo(routeMap);
+
+
+    locations.forEach(
+        (location, index) => {
+
+            const marker =
+                L.marker([
+                    location.lat,
+                    location.lon
+                ])
+                .addTo(routeMap);
+
+
+            const label =
+                index === 0
+                    ? "🚚 Starting Point"
+                    : `📍 Destination ${index}`;
+
+
+            marker.bindPopup(`
+                <strong>${label}</strong>
+                <br>
+                ${escapeHTML(location.name)}
+            `);
+
+        }
+    );
+
+
+    const bounds =
+        routeMapLayer.getBounds();
+
+
+    if (bounds.isValid()) {
+
+        routeMap.fitBounds(
+            bounds,
+            {
+                padding: [30, 30]
+            }
+        );
+
+    }
+
+
+    setTimeout(() => {
+
+        routeMap.invalidateSize();
+
+    }, 300);
+}
+
+
+/* =========================================================
+   MAP ADDITION
+   SHOW MAP FROM BACKEND RESULT
+   (uses the coordinates + road geometry the /optimize-route
+   endpoint already computed, in the OPTIMIZED order — no
+   second round of geocoding/routing on the client, and no
+   risk of the map disagreeing with the stats shown above it)
+========================================================= */
+
+async function showRouteOnMap(routeResponse) {
+
+    try {
+
+        const locations =
+            (routeResponse.locations || []).map(
+                location => ({
+
+                    name:
+                        location.name,
+
+                    lat:
+                        location.latitude,
+
+                    lon:
+                        location.longitude
+
+                })
+            );
+
+
+        if (
+            !locations.length ||
+            !routeResponse.geometry
+        ) {
+
+            throw new Error(
+                "Route response did not include map data."
+            );
+        }
+
+
+        await displayRouteMap(
+            locations,
+            { geometry: routeResponse.geometry }
+        );
+
+
+        return true;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Route map error:",
+            error
+        );
+
+
+        const mapContainer =
+            document.getElementById(
+                "routeMap"
+            );
+
+
+        if (mapContainer) {
+
+            mapContainer.innerHTML = `
+
+                <div
+                    style="
+                        height:100%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        text-align:center;
+                        padding:20px;
+                        color:#666;
+                    "
+                >
+                    ⚠️ Map could not be displayed.
+                    <br>
+                    Route optimization results are still available above.
+                </div>
+
+            `;
+        }
+
+
+        return false;
+    }
+}
+
+
+/* =========================================================
    ROUTE OPTIMIZATION
 ========================================================= */
 
@@ -1876,7 +2359,22 @@ async function optimizeRoute() {
                 <br>
                 ⚙️ ${escapeHTML(data.algorithm)}
             </div>
+
+            <!-- MAP ADDITION -->
+            <div id="routeMap"></div>
         `;
+
+
+        /*
+         * MAP ADDITION
+         *
+         * Draw the map straight from the /optimize-route response:
+         * `data.locations` and `data.geometry` are already the
+         * optimized stop order and real road geometry computed by
+         * the backend, so the map always matches the stats above it.
+         */
+        showRouteOnMap(data);
+
 
         showToast("Route calculated successfully 🚚");
 
@@ -1892,6 +2390,7 @@ async function optimizeRoute() {
         resetButton(button, "🚀 Optimize Route");
     }
 }
+
 
 /* =========================================================
    PRODUCT DETAIL MODAL
